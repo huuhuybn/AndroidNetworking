@@ -56,17 +56,22 @@ public class MainActivity extends AppCompatActivity {
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
 
-        if (networkInfo.isConnected()){
+        if (networkInfo.isConnected()) {
             MyAsyncTask myAsyncTask = new MyAsyncTask();
             myAsyncTask.execute(url);
-        }else Toast.makeText(this,"No Internet!",Toast.LENGTH_LONG).show();
+        } else Toast.makeText(this, "No Internet!", Toast.LENGTH_LONG).show();
+
+        if (networkInfo.isConnected()) {
+            PostSyncTask postSyncTask = new PostSyncTask();
+            postSyncTask.execute(urlHttpPost);
+        } else Toast.makeText(this, "No Internet!", Toast.LENGTH_LONG).show();
 
 
         tvName.setText("Huy Nguyen");
 
     }
 
-    class PostSyncTask extends AsyncTask<String,Long,String>{
+    class PostSyncTask extends AsyncTask<String, Long, String> {
 
 
         @Override
@@ -84,24 +89,20 @@ public class MainActivity extends AppCompatActivity {
 
                 OutputStream out = new BufferedOutputStream(httpURLConnection.getOutputStream());
 
-
                 HashMap<String, String> params = new HashMap<>();
 
-                params.put("username",username);
-                params.put("password",password);
+                params.put("username", username);
+                params.put("password", password);
 
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
                 writer.write(getPostDataString(params));
                 writer.flush();
                 writer.close();
                 out.close();
-
+                httpURLConnection.connect();
 
                 // doc du lieu thong qua InputStream
                 InputStream inputStream = httpURLConnection.getInputStream();
-
-
-
 
                 // doc du lieu
                 BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
@@ -110,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
 
                 for (String line; (line = r.readLine()) != null; ) {
                     total.append(line).append('\n');
-
                 }
 
                 return total.toString();
@@ -128,13 +128,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            if (s != null)
+                tvCount.setText(s);
 
         }
 
         private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
             StringBuilder result = new StringBuilder();
             boolean first = true;
-            for(Map.Entry<String, String> entry : params.entrySet()){
+            for (Map.Entry<String, String> entry : params.entrySet()) {
                 if (first)
                     first = false;
                 else
@@ -159,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         }
+
         // ko thao tac vs cac thanh phan trong UI (Giao dien)
         @Override
         protected String doInBackground(String... arrays) {
