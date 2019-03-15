@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // mo ket noi toi dia chi url
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-
+                httpURLConnection.setRequestMethod("POST");
                 OutputStream out = new BufferedOutputStream(httpURLConnection.getOutputStream());
 
                 HashMap<String, String> params = new HashMap<>();
@@ -118,8 +118,11 @@ public class MainActivity extends AppCompatActivity {
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
+
+                Log.e("AC",e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.e("ACC",e.getMessage());
             }
 
             return null;
